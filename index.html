@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Hour-wise Time Tracker</title>
+  <title>Michael Cavill</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     * {
@@ -13,30 +13,36 @@
     body {
       margin: 0;
       padding: 16px;
-      background: #0f172a;
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
       color: #e5e7eb;
+      min-height: 100vh;
     }
 
     .app {
-      max-width: 900px;
+      max-width: 1100px;
       margin: 0 auto;
-      background: #020617;
-      padding: 20px;
-      border-radius: 16px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-      border: 1px solid #1f2937;
+      background: rgba(2, 6, 23, 0.95);
+      padding: 24px;
+      border-radius: 20px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.7), 0 0 0 1px rgba(99, 102, 241, 0.1);
+      backdrop-filter: blur(10px);
     }
 
     h1 {
       margin-top: 0;
       margin-bottom: 8px;
-      font-size: 1.6rem;
+      font-size: 2rem;
+      background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .subtitle {
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       color: #9ca3af;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
+      font-weight: 300;
     }
 
     .top-bar {
@@ -44,112 +50,211 @@
       flex-wrap: wrap;
       gap: 12px;
       align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(99, 102, 241, 0.2);
     }
 
     .top-bar label {
       font-size: 0.85rem;
       color: #d1d5db;
+      margin-right: 6px;
     }
 
     input[type="date"] {
-      background: #020617;
+      background: #111827;
       color: #e5e7eb;
-      border-radius: 8px;
+      border-radius: 10px;
       border: 1px solid #374151;
-      padding: 6px 10px;
+      padding: 8px 12px;
       font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    input[type="date"]:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
     }
 
     button {
-      border-radius: 999px;
-      border: 1px solid #4b5563;
-      background: #111827;
-      padding: 6px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      padding: 8px 16px;
       font-size: 0.9rem;
       cursor: pointer;
       color: #e5e7eb;
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      transition: all 0.2s;
+      font-weight: 500;
     }
 
     button:hover {
-      background: #1f2937;
+      background: linear-gradient(135deg, #334155 0%, #475569 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+    }
+
+    button:active {
+      transform: translateY(0);
     }
 
     .pill {
-      font-size: 0.8rem;
-      padding: 4px 10px;
+      font-size: 0.85rem;
+      padding: 8px 14px;
       border-radius: 999px;
-      background: #111827;
-      border: 1px solid #374151;
+      background: linear-gradient(135deg, #1e293b 0%, #312e81 100%);
+      border: 1px solid rgba(99, 102, 241, 0.3);
       color: #9ca3af;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
+      font-weight: 500;
     }
 
     .pill strong {
-      color: #e5e7eb;
+      color: #c084fc;
+      font-size: 1.1em;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #1e293b 0%, #312e81 100%);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #c084fc;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid rgba(99, 102, 241, 0.2);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 16px;
       font-size: 0.85rem;
     }
 
     thead {
       position: sticky;
       top: 0;
-      background: #020617;
-      z-index: 1;
-    }
-
-    th, td {
-      border-bottom: 1px solid #111827;
-      padding: 6px 8px;
-      vertical-align: middle;
+      background: linear-gradient(135deg, #1e293b 0%, #312e81 100%);
+      z-index: 10;
     }
 
     th {
       text-align: left;
       font-weight: 600;
-      color: #9ca3af;
+      color: #c084fc;
+      padding: 12px 8px;
+      border-bottom: 2px solid rgba(99, 102, 241, 0.3);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
     }
 
-    tr:nth-child(even) td {
-      background: #020617;
+    td {
+      padding: 10px 8px;
+      vertical-align: middle;
+      border-bottom: 1px solid rgba(99, 102, 241, 0.1);
     }
 
-    tr:nth-child(odd) td {
-      background: #020617;
+    tr:hover td {
+      background: rgba(99, 102, 241, 0.05);
     }
 
     .hour-cell {
       white-space: nowrap;
-      color: #9ca3af;
+      color: #818cf8;
       font-variant-numeric: tabular-nums;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+
+    .checkbox-group {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .checkbox-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: #6366f1;
+      border-radius: 4px;
+    }
+
+    .checkbox-label {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      font-weight: 500;
+    }
+
+    .checkbox-wrapper.important input:checked ~ .checkbox-label {
+      color: #f59e0b;
+    }
+
+    .checkbox-wrapper.urgent input:checked ~ .checkbox-label {
+      color: #ef4444;
     }
 
     input.task-input,
     input.notes-input {
       width: 100%;
       border-radius: 8px;
-      border: 1px solid #111827;
-      background: #020617;
-      padding: 4px 6px;
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      background: #0f172a;
+      padding: 6px 10px;
       color: #e5e7eb;
       font-size: 0.85rem;
+      transition: all 0.2s;
     }
 
     input.task-input:focus,
     input.notes-input:focus {
       outline: none;
-      border-color: #4f46e5;
-      box-shadow: 0 0 0 1px #4f46e5;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      background: #111827;
+    }
+
+    input.task-input:not(:placeholder-shown) {
+      border-color: rgba(192, 132, 252, 0.3);
     }
 
     .footer {
@@ -157,16 +262,22 @@
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      margin-top: 14px;
+      margin-top: 20px;
       gap: 10px;
       font-size: 0.8rem;
       color: #9ca3af;
+      padding-top: 16px;
+      border-top: 1px solid rgba(99, 102, 241, 0.2);
     }
 
     .status {
       opacity: 0;
-      transition: opacity 0.2s ease-out;
-      font-size: 0.8rem;
+      transition: opacity 0.3s ease-out;
+      font-size: 0.85rem;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: rgba(74, 222, 128, 0.1);
+      border: 1px solid rgba(74, 222, 128, 0.3);
     }
 
     .status.visible {
@@ -175,78 +286,158 @@
     }
 
     .export-area {
-      margin-top: 10px;
+      margin-top: 16px;
+      animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     textarea {
       width: 100%;
-      min-height: 80px;
+      min-height: 120px;
       resize: vertical;
-      background: #020617;
+      background: #0f172a;
       color: #e5e7eb;
-      border-radius: 8px;
-      border: 1px solid #111827;
-      padding: 6px 8px;
+      border-radius: 10px;
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      padding: 10px 12px;
       font-size: 0.8rem;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      margin-top: 8px;
     }
 
-    @media (max-width: 640px) {
-      .hour-cell {
-        font-size: 0.75rem;
+    textarea:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .priority-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      margin-left: 6px;
+    }
+
+    .priority-do {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .priority-schedule {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fcd34d;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .priority-delegate {
+      background: rgba(59, 130, 246, 0.2);
+      color: #93c5fd;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      .app {
+        padding: 16px;
       }
 
-      th:nth-child(3),
-      td:nth-child(3) {
-        display: none; /* hide Notes col on small screens */
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      th:nth-child(4),
+      td:nth-child(4) {
+        display: none;
+      }
+
+      .checkbox-group {
+        flex-direction: column;
+        gap: 6px;
+        align-items: flex-start;
       }
     }
   </style>
 </head>
 <body>
   <div class="app">
-    <h1>Hour-wise Time Tracker</h1>
+    <h1>⏱️Michael Cavill</h1>
     <div class="subtitle">
-      Operate like you’re being watched. Track every hour. No excuses.
+      The purpose he can never fully explain,because the world wouldn't understand
     </div>
 
     <div class="top-bar">
       <div>
-        <label for="date-input">Date:</label>
+        <label for="date-input">📅 Date:</label>
         <input type="date" id="date-input" />
       </div>
-      <div class="pill">
-        Focused hours: <strong id="total-hours">0</strong> / 24
-      </div>
-      <button id="save-btn">💾 Save day</button>
-      <button id="clear-btn">🧹 Clear day</button>
-      <button id="export-btn">📤 Export all (JSON)</button>
+      <button id="save-btn">💾 Save Day</button>
+      <button id="clear-btn">🧹 Clear Day</button>
+      <button id="export-btn">📤 Export JSON</button>
     </div>
 
-    <table id="tracker-table">
-      <thead>
-        <tr>
-          <th style="width: 110px;">Hour</th>
-          <th>Task / Activity</th>
-          <th>Notes</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- rows will be generated by JS -->
-      </tbody>
-    </table>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Active Hours</div>
+        <div class="stat-value" id="total-hours">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Action</div>
+        <div class="stat-value" id="do-first-count" style="color: #fca5a5;">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Schedule</div>
+        <div class="stat-value" id="schedule-count" style="color: #fcd34d;">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Delegate</div>
+        <div class="stat-value" id="delegate-count" style="color: #93c5fd;">0</div>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table id="tracker-table">
+        <thead>
+          <tr>
+            <th style="width: 100px;">Hour</th>
+            <th style="width: 140px;">Priority</th>
+            <th>Task / Activity</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- rows generated by JS -->
+        </tbody>
+      </table>
+    </div>
 
     <div class="footer">
       <div id="status" class="status">Saved.</div>
       <div>
-        Data is stored locally in your browser (localStorage).  
-        You can close the tab – it stays.
+        💾 Data stored locally in browser. Safe to close tab.
       </div>
     </div>
 
     <div class="export-area" id="export-area" style="display:none;">
-      <label for="export-output" style="font-size:0.8rem; color:#9ca3af;">
-        Exported JSON (copy & save for backup):
+      <label for="export-output" style="font-size:0.85rem; color:#9ca3af; font-weight: 500;">
+        📋 Exported JSON (copy & save for backup):
       </label>
       <textarea id="export-output" readonly></textarea>
     </div>
@@ -254,16 +445,18 @@
 
   <script>
     (function () {
-      const STORAGE_KEY = "timeTrackerData_v1";
+      const STORAGE_KEY = "timeTrackerData_v2";
 
       const tableBody = document.querySelector("#tracker-table tbody");
       const dateInput = document.querySelector("#date-input");
       const totalHoursEl = document.querySelector("#total-hours");
+      const doFirstCountEl = document.querySelector("#do-first-count");
+      const scheduleCountEl = document.querySelector("#schedule-count");
+      const delegateCountEl = document.querySelector("#delegate-count");
       const statusEl = document.querySelector("#status");
       const exportArea = document.querySelector("#export-area");
       const exportOutput = document.querySelector("#export-output");
 
-      // Build 24 rows: 00:00–01:00 ... 23:00–00:00
       function buildRows() {
         tableBody.innerHTML = "";
         for (let h = 0; h < 24; h++) {
@@ -275,6 +468,36 @@
           const end = String((h + 1) % 24).padStart(2, "0") + ":00";
           hourTd.textContent = `${start} – ${end}`;
 
+          const priorityTd = document.createElement("td");
+          const checkboxGroup = document.createElement("div");
+          checkboxGroup.className = "checkbox-group";
+
+          const importantWrapper = document.createElement("label");
+          importantWrapper.className = "checkbox-wrapper important";
+          const importantCheck = document.createElement("input");
+          importantCheck.type = "checkbox";
+          importantCheck.className = "important-check";
+          const importantLabel = document.createElement("span");
+          importantLabel.className = "checkbox-label";
+          importantLabel.textContent = "Important";
+          importantWrapper.appendChild(importantCheck);
+          importantWrapper.appendChild(importantLabel);
+
+          const urgentWrapper = document.createElement("label");
+          urgentWrapper.className = "checkbox-wrapper urgent";
+          const urgentCheck = document.createElement("input");
+          urgentCheck.type = "checkbox";
+          urgentCheck.className = "urgent-check";
+          const urgentLabel = document.createElement("span");
+          urgentLabel.className = "checkbox-label";
+          urgentLabel.textContent = "Urgent";
+          urgentWrapper.appendChild(urgentCheck);
+          urgentWrapper.appendChild(urgentLabel);
+
+          checkboxGroup.appendChild(importantWrapper);
+          checkboxGroup.appendChild(urgentWrapper);
+          priorityTd.appendChild(checkboxGroup);
+
           const taskTd = document.createElement("td");
           const taskInput = document.createElement("input");
           taskInput.type = "text";
@@ -285,11 +508,12 @@
           const notesTd = document.createElement("td");
           const notesInput = document.createElement("input");
           notesInput.type = "text";
-          notesInput.placeholder = "Notes / distractions / room";
+          notesInput.placeholder = "Notes / distractions / context";
           notesInput.className = "notes-input";
           notesTd.appendChild(notesInput);
 
           tr.appendChild(hourTd);
+          tr.appendChild(priorityTd);
           tr.appendChild(taskTd);
           tr.appendChild(notesTd);
 
@@ -320,16 +544,38 @@
         return dateInput.value;
       }
 
-      function updateTotalHours() {
+      function updateStats() {
         const rows = getAllRows();
-        let count = 0;
+        let totalCount = 0;
+        let doFirstCount = 0;
+        let scheduleCount = 0;
+        let delegateCount = 0;
+
         rows.forEach((row) => {
           const taskInput = row.querySelector(".task-input");
+          const importantCheck = row.querySelector(".important-check");
+          const urgentCheck = row.querySelector(".urgent-check");
+
           if (taskInput && taskInput.value.trim() !== "") {
-            count += 1; // treat every filled hour as 1 tracked hour
+            totalCount += 1;
+
+            const isImportant = importantCheck.checked;
+            const isUrgent = urgentCheck.checked;
+
+            if (isImportant && isUrgent) {
+              doFirstCount += 1;
+            } else if (isImportant && !isUrgent) {
+              scheduleCount += 1;
+            } else if (!isImportant && isUrgent) {
+              delegateCount += 1;
+            }
           }
         });
-        totalHoursEl.textContent = String(count);
+
+        totalHoursEl.textContent = String(totalCount);
+        doFirstCountEl.textContent = String(doFirstCount);
+        scheduleCountEl.textContent = String(scheduleCount);
+        delegateCountEl.textContent = String(delegateCount);
       }
 
       function showStatus(message) {
@@ -337,64 +583,89 @@
         statusEl.classList.add("visible");
         setTimeout(() => {
           statusEl.classList.remove("visible");
-        }, 1200);
+        }, 1500);
       }
 
       function loadDay(dateKey) {
         const data = getDataObject();
         const day = data[dateKey] || [];
         const rows = getAllRows();
+        
         rows.forEach((row, index) => {
           const taskInput = row.querySelector(".task-input");
           const notesInput = row.querySelector(".notes-input");
-          const entry = day[index] || { task: "", notes: "" };
+          const importantCheck = row.querySelector(".important-check");
+          const urgentCheck = row.querySelector(".urgent-check");
+          
+          const entry = day[index] || { task: "", notes: "", important: false, urgent: false };
+          
           if (taskInput) taskInput.value = entry.task || "";
           if (notesInput) notesInput.value = entry.notes || "";
+          if (importantCheck) importantCheck.checked = entry.important || false;
+          if (urgentCheck) urgentCheck.checked = entry.urgent || false;
         });
-        updateTotalHours();
+        
+        updateStats();
       }
 
       function saveDay() {
         const dateKey = getCurrentDateKey();
         if (!dateKey) {
-          showStatus("Select a date first.");
+          showStatus("⚠️ Select a date first");
           return;
         }
+        
         const data = getDataObject();
         const rows = getAllRows();
+        
         const day = rows.map((row) => {
           const taskInput = row.querySelector(".task-input");
           const notesInput = row.querySelector(".notes-input");
+          const importantCheck = row.querySelector(".important-check");
+          const urgentCheck = row.querySelector(".urgent-check");
+          
           return {
             task: taskInput ? taskInput.value.trim() : "",
             notes: notesInput ? notesInput.value.trim() : "",
+            important: importantCheck ? importantCheck.checked : false,
+            urgent: urgentCheck ? urgentCheck.checked : false,
           };
         });
 
         data[dateKey] = day;
         setDataObject(data);
-        updateTotalHours();
-        showStatus("Saved ✔");
+        updateStats();
+        showStatus("✅ Saved successfully");
       }
 
       function clearDay() {
+        const confirmed = confirm("Are you sure you want to clear all data for this day?");
+        if (!confirmed) return;
+
         const rows = getAllRows();
         rows.forEach((row) => {
           const taskInput = row.querySelector(".task-input");
           const notesInput = row.querySelector(".notes-input");
+          const importantCheck = row.querySelector(".important-check");
+          const urgentCheck = row.querySelector(".urgent-check");
+          
           if (taskInput) taskInput.value = "";
           if (notesInput) notesInput.value = "";
+          if (importantCheck) importantCheck.checked = false;
+          if (urgentCheck) urgentCheck.checked = false;
         });
-        updateTotalHours();
+        
+        updateStats();
         saveDay();
-        showStatus("Cleared for this day");
+        showStatus("🧹 Day cleared");
       }
 
       function exportAll() {
         const data = getDataObject();
         exportOutput.value = JSON.stringify(data, null, 2);
         exportArea.style.display = "block";
-        showStatus("Exported all data");
+        exportOutput.select();
+        showStatus("📤 Exported - ready to copy");
       }
 
       function initDate() {
@@ -407,33 +678,28 @@
         }
       }
 
-      // EVENT LISTENERS
       function attachEvents() {
-        document
-          .getElementById("save-btn")
-          .addEventListener("click", saveDay);
-
-        document
-          .getElementById("clear-btn")
-          .addEventListener("click", clearDay);
-
-        document
-          .getElementById("export-btn")
-          .addEventListener("click", exportAll);
+        document.getElementById("save-btn").addEventListener("click", saveDay);
+        document.getElementById("clear-btn").addEventListener("click", clearDay);
+        document.getElementById("export-btn").addEventListener("click", exportAll);
 
         dateInput.addEventListener("change", () => {
           loadDay(getCurrentDateKey());
         });
 
-        // Update total hours live as user types
         tableBody.addEventListener("input", (e) => {
           if (e.target.classList.contains("task-input")) {
-            updateTotalHours();
+            updateStats();
+          }
+        });
+
+        tableBody.addEventListener("change", (e) => {
+          if (e.target.type === "checkbox") {
+            updateStats();
           }
         });
       }
 
-      // INIT
       buildRows();
       initDate();
       attachEvents();
