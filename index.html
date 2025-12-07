@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hour-wise Time Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      background: #0f172a;
+      color: #e5e7eb;
+    }
+
+    .app {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #020617;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      border: 1px solid #1f2937;
+    }
+
+    h1 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 1.6rem;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin-bottom: 16px;
+    }
+
+    .top-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .top-bar label {
+      font-size: 0.85rem;
+      color: #d1d5db;
+    }
+
+    input[type="date"] {
+      background: #020617;
+      color: #e5e7eb;
+      border-radius: 8px;
+      border: 1px solid #374151;
+      padding: 6px 10px;
+      font-size: 0.9rem;
+    }
+
+    button {
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      background: #111827;
+      padding: 6px 14px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: #e5e7eb;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    button:hover {
+      background: #1f2937;
+    }
+
+    .pill {
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #111827;
+      border: 1px solid #374151;
+      color: #9ca3af;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .pill strong {
+      color: #e5e7eb;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 0.85rem;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      background: #020617;
+      z-index: 1;
+    }
+
+    th, td {
+      border-bottom: 1px solid #111827;
+      padding: 6px 8px;
+      vertical-align: middle;
+    }
+
+    th {
+      text-align: left;
+      font-weight: 600;
+      color: #9ca3af;
+    }
+
+    tr:nth-child(even) td {
+      background: #020617;
+    }
+
+    tr:nth-child(odd) td {
+      background: #020617;
+    }
+
+    .hour-cell {
+      white-space: nowrap;
+      color: #9ca3af;
+      font-variant-numeric: tabular-nums;
+    }
+
+    input.task-input,
+    input.notes-input {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #111827;
+      background: #020617;
+      padding: 4px 6px;
+      color: #e5e7eb;
+      font-size: 0.85rem;
+    }
+
+    input.task-input:focus,
+    input.notes-input:focus {
+      outline: none;
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 1px #4f46e5;
+    }
+
+    .footer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+      gap: 10px;
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    .status {
+      opacity: 0;
+      transition: opacity 0.2s ease-out;
+      font-size: 0.8rem;
+    }
+
+    .status.visible {
+      opacity: 1;
+      color: #4ade80;
+    }
+
+    .export-area {
+      margin-top: 10px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 80px;
+      resize: vertical;
+      background: #020617;
+      color: #e5e7eb;
+      border-radius: 8px;
+      border: 1px solid #111827;
+      padding: 6px 8px;
+      font-size: 0.8rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    @media (max-width: 640px) {
+      .hour-cell {
+        font-size: 0.75rem;
+      }
+
+      th:nth-child(3),
+      td:nth-child(3) {
+        display: none; /* hide Notes col on small screens */
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>Hour-wise Time Tracker</h1>
+    <div class="subtitle">
+      Operate like you’re being watched. Track every hour. No excuses.
+    </div>
+
+    <div class="top-bar">
+      <div>
+        <label for="date-input">Date:</label>
+        <input type="date" id="date-input" />
+      </div>
+      <div class="pill">
+        Focused hours: <strong id="total-hours">0</strong> / 24
+      </div>
+      <button id="save-btn">💾 Save day</button>
+      <button id="clear-btn">🧹 Clear day</button>
+      <button id="export-btn">📤 Export all (JSON)</button>
+    </div>
+
+    <table id="tracker-table">
+      <thead>
+        <tr>
+          <th style="width: 110px;">Hour</th>
+          <th>Task / Activity</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- rows will be generated by JS -->
+      </tbody>
+    </table>
+
+    <div class="footer">
+      <div id="status" class="status">Saved.</div>
+      <div>
+        Data is stored locally in your browser (localStorage).  
+        You can close the tab – it stays.
+      </div>
+    </div>
+
+    <div class="export-area" id="export-area" style="display:none;">
+      <label for="export-output" style="font-size:0.8rem; color:#9ca3af;">
+        Exported JSON (copy & save for backup):
+      </label>
+      <textarea id="export-output" readonly></textarea>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const STORAGE_KEY = "timeTrackerData_v1";
+
+      const tableBody = document.querySelector("#tracker-table tbody");
+      const dateInput = document.querySelector("#date-input");
+      const totalHoursEl = document.querySelector("#total-hours");
+      const statusEl = document.querySelector("#status");
+      const exportArea = document.querySelector("#export-area");
+      const exportOutput = document.querySelector("#export-output");
+
+      // Build 24 rows: 00:00–01:00 ... 23:00–00:00
+      function buildRows() {
+        tableBody.innerHTML = "";
+        for (let h = 0; h < 24; h++) {
+          const tr = document.createElement("tr");
+
+          const hourTd = document.createElement("td");
+          hourTd.className = "hour-cell";
+          const start = String(h).padStart(2, "0") + ":00";
+          const end = String((h + 1) % 24).padStart(2, "0") + ":00";
+          hourTd.textContent = `${start} – ${end}`;
+
+          const taskTd = document.createElement("td");
+          const taskInput = document.createElement("input");
+          taskInput.type = "text";
+          taskInput.placeholder = "What are you doing this hour?";
+          taskInput.className = "task-input";
+          taskTd.appendChild(taskInput);
+
+          const notesTd = document.createElement("td");
+          const notesInput = document.createElement("input");
+          notesInput.type = "text";
+          notesInput.placeholder = "Notes / distractions / room";
+          notesInput.className = "notes-input";
+          notesTd.appendChild(notesInput);
+
+          tr.appendChild(hourTd);
+          tr.appendChild(taskTd);
+          tr.appendChild(notesTd);
+
+          tableBody.appendChild(tr);
+        }
+      }
+
+      function getAllRows() {
+        return Array.from(tableBody.querySelectorAll("tr"));
+      }
+
+      function getDataObject() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return {};
+        try {
+          return JSON.parse(raw) || {};
+        } catch (e) {
+          console.error("Error parsing stored data", e);
+          return {};
+        }
+      }
+
+      function setDataObject(obj) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+      }
+
+      function getCurrentDateKey() {
+        return dateInput.value;
+      }
+
+      function updateTotalHours() {
+        const rows = getAllRows();
+        let count = 0;
+        rows.forEach((row) => {
+          const taskInput = row.querySelector(".task-input");
+          if (taskInput && taskInput.value.trim() !== "") {
+            count += 1; // treat every filled hour as 1 tracked hour
+          }
+        });
+        totalHoursEl.textContent = String(count);
+      }
+
+      function showStatus(message) {
+        statusEl.textContent = message;
+        statusEl.classList.add("visible");
+        setTimeout(() => {
+          statusEl.classList.remove("visible");
+        }, 1200);
+      }
+
+      function loadDay(dateKey) {
+        const data = getDataObject();
+        const day = data[dateKey] || [];
+        const rows = getAllRows();
+        rows.forEach((row, index) => {
+          const taskInput = row.querySelector(".task-input");
+          const notesInput = row.querySelector(".notes-input");
+          const entry = day[index] || { task: "", notes: "" };
+          if (taskInput) taskInput.value = entry.task || "";
+          if (notesInput) notesInput.value = entry.notes || "";
+        });
+        updateTotalHours();
+      }
+
+      function saveDay() {
+        const dateKey = getCurrentDateKey();
+        if (!dateKey) {
+          showStatus("Select a date first.");
+          return;
+        }
+        const data = getDataObject();
+        const rows = getAllRows();
+        const day = rows.map((row) => {
+          const taskInput = row.querySelector(".task-input");
+          const notesInput = row.querySelector(".notes-input");
+          return {
+            task: taskInput ? taskInput.value.trim() : "",
+            notes: notesInput ? notesInput.value.trim() : "",
+          };
+        });
+
+        data[dateKey] = day;
+        setDataObject(data);
+        updateTotalHours();
+        showStatus("Saved ✔");
+      }
+
+      function clearDay() {
+        const rows = getAllRows();
+        rows.forEach((row) => {
+          const taskInput = row.querySelector(".task-input");
+          const notesInput = row.querySelector(".notes-input");
+          if (taskInput) taskInput.value = "";
+          if (notesInput) notesInput.value = "";
+        });
+        updateTotalHours();
+        saveDay();
+        showStatus("Cleared for this day");
+      }
+
+      function exportAll() {
+        const data = getDataObject();
+        exportOutput.value = JSON.stringify(data, null, 2);
+        exportArea.style.display = "block";
+        showStatus("Exported all data");
+      }
+
+      function initDate() {
+        if (!dateInput.value) {
+          const today = new Date();
+          const yyyy = today.getFullYear();
+          const mm = String(today.getMonth() + 1).padStart(2, "0");
+          const dd = String(today.getDate()).padStart(2, "0");
+          dateInput.value = `${yyyy}-${mm}-${dd}`;
+        }
+      }
+
+      // EVENT LISTENERS
+      function attachEvents() {
+        document
+          .getElementById("save-btn")
+          .addEventListener("click", saveDay);
+
+        document
+          .getElementById("clear-btn")
+          .addEventListener("click", clearDay);
+
+        document
+          .getElementById("export-btn")
+          .addEventListener("click", exportAll);
+
+        dateInput.addEventListener("change", () => {
+          loadDay(getCurrentDateKey());
+        });
+
+        // Update total hours live as user types
+        tableBody.addEventListener("input", (e) => {
+          if (e.target.classList.contains("task-input")) {
+            updateTotalHours();
+          }
+        });
+      }
+
+      // INIT
+      buildRows();
+      initDate();
+      attachEvents();
+      loadDay(getCurrentDateKey());
+    })();
+  </script>
+</body>
+</html>
